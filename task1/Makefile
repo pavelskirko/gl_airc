@@ -1,9 +1,16 @@
+IDIR = ./include
 CC=gcc
-CFLAGS=-I.
-DEPS = signal_gen.h
-OBJ = signal_gen.o
+ODIR = obj
+CFLAGS=-I$(IDIR)
+SRCDIR=
 
-%.o: %.c $(DEPS)
+_DEPS = signal_gen.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)) # return each string in _DEPS as IDIR/%.o 
+
+_OBJ = signal_gen.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ)) # return each string in _OBJ as ODIR/%.o 
+
+$(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 signal_gen: $(OBJ)  
