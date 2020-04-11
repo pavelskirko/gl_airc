@@ -36,7 +36,7 @@ void print_track(char * track_data_start, int track_specific_length, int * track
    {
       for(int i = 0; i < track_specific_length; i++)
       {
-         float sample;
+         float sample = 0;
          memcpy(&sample, track_data_start, *track_depth / 8);
          track_data_start += *track_depth / 8;
          printf("%f ", sample);
@@ -46,10 +46,9 @@ void print_track(char * track_data_start, int track_specific_length, int * track
    {
       for(int i = 0; i < track_specific_length; i++)
       {
-         int sample;
-         memcpy(&sample, track_data_start, *track_depth / 8);
-         track_data_start += *track_depth / 8;
-         printf("%i ", sample);
+         int sample = 0;
+         memcpy(&sample, track_data_start + i * *track_depth / 8, *track_depth / 8);
+         printf("%d ", sample);
       }
    }   
 }
