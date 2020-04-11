@@ -1,6 +1,6 @@
 #include "get_user_input.h"
 
-void get_user_input(int * track_length, int * track_depth, int * track_depth_type, int * track_freq, int * intrvl_start, int * intrvl_length, 
+void get_user_input(int * track_length, int * track_depth, int * track_depth_type, int * track_freq, int * intrvl_type, int * intrvl_start, int * intrvl_length, 
                      int * ampl, int * freq, int * phase, int * user_choise, int * user_choise_2nd, char * file_name)
 {
    *user_choise = 0;
@@ -53,7 +53,6 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
          break;
       }
       *user_choise_2nd = 0;
-      scanf("%d", track_depth);
       printf("Please choose a desired freq (1-4): \n"
       "\t1) 44.1 kHz \n"
       "\t2) 44 kHz \n"
@@ -81,6 +80,10 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
       }
       break;
     case 3:
+      printf("What type of signal would you like to create? (1-2)\n"
+      "\t1) sine\n"
+      "\t2) triangle\n");
+      scanf("%d", intrvl_type);
       printf("Please enter the start time (in seconds) ");
       scanf("%d", intrvl_start);
       printf("Please enter the length (in seconds) ");
