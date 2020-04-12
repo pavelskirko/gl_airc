@@ -21,9 +21,9 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
       else
       {
          int sample = (int)( *ampl * (sin(specific_phase + 6.28 * specific_freq*i)));
-         if (sample > pow(2,*track_depth)) // 2 ^ (*track_depth) is max value of unsigned (*track_depth)-bit number  
+         if (sample > pow(2,*track_depth - 1)) // 2 ^ (*track_depth - 1) is max value of signed (*track_depth)-bit number  
          {
-            sample = pow(2,*track_depth);
+            sample = pow(2,*track_depth - 1);
          }
          memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
          track_data_start += *track_depth / 8;
@@ -31,13 +31,30 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
    }
 }
 
-// void triangle_generator(char * track_data_start, int * track_depth, int * track_depth_type, 
-//                      float specific_freq, float specific_phase, int specific_length, int * ampl)
-// {
-   
-// }
+void triangle_generator(char * track_data_start, int * track_depth, int * track_depth_type, 
+                     float specific_freq, float specific_phase, int specific_length, int * ampl)
+{
+   for (int i = 0; i < specific_length; i++)
+   {
+      if (*track_depth_type)
+      {
+         float sample = (double)*ampl * asin(sin(specific_phase + 6.28 * specific_freq * i)) * (2 / 3.14) ;
+         memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
+         track_data_start += *track_depth / 8;
+      }
+      else
+      {
+         int sample = (int) ((double)*ampl * asin(sin(specific_phase + 6.28 * specific_freq * i)) * (2 / 3.14) );
+         if (sample > pow(2,*track_depth - 1)) // 2 ^ (*track_depth - 1) is max value of signed (*track_depth)-bit number  
+         {
+            sample = pow(2,*track_depth - 1);
+         }
+         memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
+         track_data_start += *track_depth / 8;
+      }  
+   }
+}
 
-signed char * track_data;
 
 int main() {
    int track_length;
@@ -54,7 +71,7 @@ int main() {
    int user_choise_2nd;
    char file_name[] = "generated_signal.csv";
    FILE *stream;
-   
+   signed char * track_data;
    int track_memory_allocated = 0;
    printf("The following program is generating a set of user defined signals on a given time interval. \n");
    while(1)
@@ -87,6 +104,11 @@ int main() {
             if (intrvl_type == 1)
             {
                sine_generator(track_data + (track_depth/8) * intrvl_start * track_freq, 
+                              &track_depth, &track_depth_type, (double)freq/track_freq, phase, intrvl_length * track_freq, &ampl);
+            }
+            else if (intrvl_type == 2)
+            {
+               triangle_generator(track_data + (track_depth/8) * intrvl_start * track_freq, 
                               &track_depth, &track_depth_type, (double)freq/track_freq, phase, intrvl_length * track_freq, &ampl);
             }
          }
