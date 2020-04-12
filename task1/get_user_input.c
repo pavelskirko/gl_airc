@@ -8,7 +8,9 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
    printf("Please choose what would you like to do: \n"
     "1) Read track from .csv file \n"
     "2) Create new track \n"
-    "3) Add signal to the track \n");
+    "3) Add signal to the track \n"
+    "4) Write track to the file\n"
+    "5) Print track to the console\n");
     scanf("%d", user_choise);
     switch (*user_choise)
     {
@@ -94,6 +96,12 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
       scanf("%d", freq);
       printf("Please enter the phase ");
       scanf("%d", phase);
+      break;
+    case 4:
+      
+      break;
+    case 5:
+      
       break;
     default:
        printf("Wrong input, try again. \n");
