@@ -4,10 +4,10 @@ ODIR = obj
 CFLAGS=-I$(IDIR)
 SRCDIR=
 
-_DEPS = get_user_input.h signal_gen.h  io.h
+_DEPS = get_user_input.h signal_gen.h  io.h generators.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))  # return each string in _DEPS as IDIR/%.o 
 
-_OBJ = signal_gen.o get_user_input.o io.o
+_OBJ = signal_gen.o get_user_input.o io.o generators.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ)) # return each string in _OBJ as ODIR/%.o 
 
 $(ODIR)/%.o: %.c $(DEPS)

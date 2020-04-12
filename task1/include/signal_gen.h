@@ -6,7 +6,7 @@
 #include <math.h>
 #include "get_user_input.h"
 #include "io.h"
-
+#include "generators.h"
 
 int main();
 
