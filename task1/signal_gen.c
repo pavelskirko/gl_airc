@@ -20,7 +20,7 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
       }
       else
       {
-         unsigned int sample = (int)( *ampl * (1+sin(specific_phase + 6.28 * specific_freq*i)));
+         int sample = (int)( *ampl * (sin(specific_phase + 6.28 * specific_freq*i)));
          if (sample > pow(2,*track_depth)) // 2 ^ (*track_depth) is max value of unsigned (*track_depth)-bit number  
          {
             sample = pow(2,*track_depth);
@@ -30,6 +30,14 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
       }  
    }
 }
+
+// void triangle_generator(char * track_data_start, int * track_depth, int * track_depth_type, 
+//                      float specific_freq, float specific_phase, int specific_length, int * ampl)
+// {
+   
+// }
+
+signed char * track_data;
 
 int main() {
    int track_length;
@@ -46,7 +54,7 @@ int main() {
    int user_choise_2nd;
    char file_name[] = "generated_signal.csv";
    FILE *stream;
-   char * track_data;
+   
    int track_memory_allocated = 0;
    printf("The following program is generating a set of user defined signals on a given time interval. \n");
    while(1)
