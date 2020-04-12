@@ -10,7 +10,8 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
     "2) Create new track \n"
     "3) Add signal to the track \n"
     "4) Write track to the file\n"
-    "5) Print track to the console\n");
+    "5) Print track to the console\n"
+    "6) Close\n");
     scanf("%d", user_choise);
     switch (*user_choise)
     {
@@ -102,6 +103,9 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
       break;
     case 5:
       
+      break;
+    case 6:
+
       break;
     default:
        printf("Wrong input, try again. \n");

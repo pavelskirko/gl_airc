@@ -14,13 +14,13 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
    {
       if (*track_depth_type)
       {
-         float sample = *ampl * sin(specific_phase + specific_freq * i);
+         float sample = *ampl * sin(specific_phase + 6.28 * specific_freq * i);
          memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
          track_data_start += *track_depth / 8;
       }
       else
       {
-         unsigned int sample = (int)( *ampl * (1+sin(specific_phase + specific_freq*i)));
+         unsigned int sample = (int)( *ampl * (1+sin(specific_phase + 6.28 * specific_freq*i)));
          if (sample > pow(2,*track_depth)) // 2 ^ (*track_depth) is max value of unsigned (*track_depth)-bit number  
          {
             sample = pow(2,*track_depth);
@@ -29,54 +29,6 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
          track_data_start += *track_depth / 8;
       }  
    }
-}
-
-void write_to_file(FILE* stream, char file_name[], char * track_data, int track_specific_length, int * track_depth, int * track_depth_type)
-{
-   stream = fopen(file_name, "w");
-   if (*track_depth_type)
-   {
-      for(int i = 0; i < track_specific_length; i++)
-      {
-         float sample = 0;
-         memcpy(&sample, track_data + i * *track_depth / 8, *track_depth / 8);
-         fprintf(stream, "%f\n", sample);
-      }      
-   }
-   else
-   {
-      for(int i = 0; i < track_specific_length; i++)
-      {
-         unsigned int sample = 0;
-         memcpy(&sample, track_data + i * *track_depth / 8, *track_depth / 8);
-         fprintf(stream, "%i\n", sample);
-      }
-   }
-   fclose(stream);    
-}
-
-void print_track(char * track_data_start, int track_specific_length, int * track_depth, int * track_depth_type)
-{
-   // track_specific_length is a number of samples in the track
-   if (*track_depth_type)
-   {
-      for(int i = 0; i < track_specific_length; i++)
-      {
-         float sample = 0;
-         memcpy(&sample, track_data_start, *track_depth / 8);
-         track_data_start += *track_depth / 8;
-         printf("%f ", sample);
-      }      
-   }
-   else
-   {
-      for(int i = 0; i < track_specific_length; i++)
-      {
-         unsigned int sample = 0;
-         memcpy(&sample, track_data_start + i * *track_depth / 8, *track_depth / 8);
-         printf("%d ", sample);
-      }
-   }   
 }
 
 int main() {
@@ -95,6 +47,7 @@ int main() {
    char file_name[] = "generated_signal.csv";
    FILE *stream;
    char * track_data;
+   int track_memory_allocated = 0;
    printf("The following program is generating a set of user defined signals on a given time interval. \n");
    while(1)
    {
@@ -113,14 +66,12 @@ int main() {
          
          break;
       case 2:
-         // if (!track_depth_type) 
-         // {
-         track_data = (char *) malloc((track_depth/8) * track_length * track_freq); // track_depth is a multiple of 8 by the design       
-         // }   
-         // else
-         // {
-         //    track_data = (float *) malloc(sizeof(float) * track_length * track_freq);
-         // }
+         if(track_memory_allocated)
+         {
+            free(track_data);
+         }
+         track_data = (char *) malloc((track_depth/8) * track_length * track_freq); // track_depth is a multiple of 8 by the design  
+         track_memory_allocated = 0;     
          break;
       case 3:
          if (track_length - intrvl_start - intrvl_length >= 0)
@@ -145,7 +96,17 @@ int main() {
       case 5:
        print_track(track_data, track_length*track_freq, &track_depth, &track_depth_type);
        break;
+      case 6:
+       if(track_memory_allocated)
+       {
+          free(track_data);
+       }
+       break;
       default:
+         break;
+      }
+      if(user_choise == 6)
+      {
          break;
       }
    }
