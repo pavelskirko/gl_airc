@@ -20,20 +20,32 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
    // specific_phase = interval_phase / track_freq
    // specific_length = lendth(seconds) * track_freq
 
-   // track_depth_check(track_depth, track_depth_residual);
-
+   int track_byte_depth = *track_depth / 8; // track_byte_depth is a number of bytes needed to store
+                                                               //  (*track_depth- *track_depth_residual)-bit number
    for (int i = 0; i < specific_length; i++)
    {
       if (*track_depth_type)
       {
          float sample = *ampl * sin(specific_phase + 6.28 * specific_freq * i);
-         memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
-         track_data_start += *track_depth / 8;
+         float sample_prev = 0;
+         memcpy(&sample_prev, track_data_start, track_byte_depth);
+         sample += sample_prev;
+         memcpy(track_data_start, &sample, track_byte_depth); 
+         track_data_start += track_byte_depth;
       }
       else
       {
          int sample = (int)( *ampl * (sin(specific_phase + 6.28 * specific_freq*i)));
-         if (sample > pow(2,*track_depth - 1 - *track_depth_residual)) // 2 ^ (*track_depth - 1) is max value of signed (*track_depth)-bit number  
+         int sample_prev = 0;
+         memcpy(&sample_prev, track_data_start, track_byte_depth);
+         if(sample_prev & (1 << (*track_depth - 1))) // if it was originally negative
+         {
+             sample_prev = -1; // not an efficient but a clear way to make sure it will be negative in the Two's complement notation
+             memcpy(&sample_prev, track_data_start, track_byte_depth);
+         }
+         sample += sample_prev;
+         if (sample > pow(2,*track_depth - 1 - *track_depth_residual)) // 2 ^ (*track_depth - 1 - *track_depth_residual) is 
+                                                         // a max value of a signed (*track_depth - *track_depth_residual)-bit number  
          {
             sample = pow(2,*track_depth - 1 - *track_depth_residual) - 1;
          }
@@ -42,8 +54,8 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
              sample = -pow(2,*track_depth - 1 - *track_depth_residual);
          }
          
-         memcpy(track_data_start, &sample, *track_depth / 8); // track_depth / 8 is a number of bytes in (*track_depth)-bit number
-         track_data_start += *track_depth / 8;
+         memcpy(track_data_start, &sample, track_byte_depth); 
+         track_data_start += track_byte_depth;
       }  
    }
 }
@@ -51,18 +63,32 @@ void sine_generator(char * track_data_start, int * track_depth, int * track_dept
 void triangle_generator(char * track_data_start, int * track_depth, int * track_depth_residual, int * track_depth_type, 
                      float specific_freq, float specific_phase, int specific_length, int * ampl)
 {
+   int track_byte_depth = *track_depth / 8; // track_byte_depth is a number of bytes needed to store
+                                                               //  (*track_depth- *track_depth_residual)-bit number
    for (int i = 0; i < specific_length; i++)
    {
       if (*track_depth_type)
       {
          float sample = (double)*ampl * asin(sin(specific_phase + 6.28 * specific_freq * i)) * (2 / 3.14);
-         memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
-         track_data_start += *track_depth / 8;
+         float sample_prev = 0;
+         memcpy(&sample_prev, track_data_start, track_byte_depth);
+         sample += sample_prev;
+         memcpy(track_data_start, &sample, track_byte_depth); 
+         track_data_start += track_byte_depth;
       }
       else
       {
          int sample = (int) ((double)*ampl * asin(sin(specific_phase + 6.28 * specific_freq * i)) * (2 / 3.14) );
-         if (sample > pow(2,*track_depth - 1 - *track_depth_residual)) // 2 ^ (*track_depth - 1) is max value of signed (*track_depth)-bit number  
+         int sample_prev = 0;
+         memcpy(&sample_prev, track_data_start, track_byte_depth);
+         if(sample_prev & (1 << (*track_depth - 1))) // if it was originally negative
+         {
+             sample_prev = -1; // not an efficient but a clear way to make sure it will be negative in the Two's complement notation
+             memcpy(&sample_prev, track_data_start, track_byte_depth);
+         }
+         sample += sample_prev;
+         if (sample > pow(2,*track_depth - 1 - *track_depth_residual)) // 2 ^ (*track_depth - 1 - *track_depth_residual) is 
+                                                         // a max value of a signed (*track_depth - *track_depth_residual)-bit number 
          {
             sample = pow(2,*track_depth - 1 - *track_depth_residual) - 1;
          }
@@ -70,8 +96,8 @@ void triangle_generator(char * track_data_start, int * track_depth, int * track_
          {
              sample = -pow(2,*track_depth - 1 - *track_depth_residual);
          }
-         memcpy(track_data_start, &sample, *track_depth / 8); // *track_depth / 8 is a number of bytes in (*track_depth)-bit number
-         track_data_start += *track_depth / 8;
+         memcpy(track_data_start, &sample, track_byte_depth); 
+         track_data_start += track_byte_depth;
       }  
    }
 }
