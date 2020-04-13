@@ -1,6 +1,6 @@
 #include "io.h"
 
-void recover_from_file(char ** track_data, int * track_length, int * track_depth, int * track_depth_type, int * track_freq,
+void recover_from_file(char ** track_data, int * track_length, int * track_depth, int * track_depth_residual, int * track_depth_type, int * track_freq,
                             char * file_name, char * file_param_name, FILE *stream, FILE *stream_par, int * track_memory_allocated)
 {
    stream_par = fopen(file_param_name, "r");
@@ -12,6 +12,7 @@ void recover_from_file(char ** track_data, int * track_length, int * track_depth
    {
         fscanf(stream_par, "%i\n", track_length);
         fscanf(stream_par, "%i\n", track_depth);
+        fscanf(stream_par, "%i\n", track_depth_residual);
         fscanf(stream_par, "%i\n", track_depth_type);
         fscanf(stream_par, "%i\n", track_freq);
         fclose(stream_par);
@@ -60,12 +61,13 @@ void recover_from_file(char ** track_data, int * track_length, int * track_depth
     
 }
 
-void write_params_to_file(int * track_length, int * track_depth, int * track_depth_type, int * track_freq,
+void write_params_to_file(int * track_length, int * track_depth, int * track_depth_residual, int * track_depth_type, int * track_freq,
                                                                     char * file_param_name, FILE *stream_par)
 {
     stream_par = fopen(file_param_name, "w");
     fprintf(stream_par, "%i\n", *track_length);
     fprintf(stream_par, "%i\n", *track_depth);
+    fprintf(stream_par, "%i\n", *track_depth_residual);
     fprintf(stream_par, "%i\n", *track_depth_type);
     fprintf(stream_par, "%i\n", *track_freq);
     fclose(stream_par);
@@ -73,13 +75,14 @@ void write_params_to_file(int * track_length, int * track_depth, int * track_dep
 
 void write_to_file(FILE* stream, char file_name[], char * track_data, int track_specific_length, int * track_depth, int * track_depth_type)
 {
+    int track_byte_depth = *track_depth / 8; // depth in bytes 
    stream = fopen(file_name, "w");
    if (*track_depth_type)
    {
       for(int i = 0; i < track_specific_length; i++)
       {
          float sample = 0;
-         memcpy(&sample, track_data + i * *track_depth / 8, *track_depth / 8);
+         memcpy(&sample, track_data + i * track_byte_depth, track_byte_depth);
          fprintf(stream, "%f\n", sample);
       }      
    }
@@ -88,11 +91,11 @@ void write_to_file(FILE* stream, char file_name[], char * track_data, int track_
       for(int i = 0; i < track_specific_length; i++)
       {
          int sample = 0;
-         memcpy(&sample, track_data + i * *track_depth / 8, *track_depth / 8);
+         memcpy(&sample, track_data + i * track_byte_depth, track_byte_depth);
          if(sample & (1 << (*track_depth - 1))) // if it was originally negative
          {
              sample = -1; // not efficient but clear way to make sure it will be negative in Two's complement notation
-             memcpy(&sample, track_data + i * *track_depth / 8, *track_depth / 8);
+             memcpy(&sample, track_data + i * track_byte_depth, track_byte_depth);
          }
          fprintf(stream, "%i\n", sample);
       }
@@ -109,7 +112,6 @@ void print_track(char * track_data_start, int track_specific_length, int * track
       {
          float sample = 0;
          memcpy(&sample, track_data_start + i * *track_depth / 8, *track_depth / 8);
-        //  track_data_start += *track_depth / 8;
          printf("%f ", sample);
       }      
    }

@@ -4,11 +4,11 @@
 
 //TODO switch to sending values to functions instead of pointers where it is suitable
 
-
 int main() {
    int track_length;
    int track_depth;
-   int track_depth_type = 0; // 1 if float
+   int track_depth_residual;
+   int track_depth_type = 0; // 1 if float 32
    int track_freq;
    int intrvl_type; // 1 -- sine; 2 -- triangle
    int intrvl_start;
@@ -39,10 +39,11 @@ int main() {
       switch (user_choise)
       {
       case 1:
-         recover_from_file(&track_data, &track_length, &track_depth, &track_depth_type, &track_freq, file_name, file_param_name, 
+         recover_from_file(&track_data, &track_length, &track_depth, &track_depth_residual, &track_depth_type, &track_freq, file_name, file_param_name, 
                                        stream, stream_par, &track_memory_allocated);
          break;
       case 2:
+         track_depth_check(&track_depth, &track_depth_residual);
          if(track_memory_allocated)
          {
             free(track_data);
@@ -56,12 +57,12 @@ int main() {
             if (intrvl_type == 1)
             {
                sine_generator(track_data + (track_depth/8) * intrvl_start * track_freq, 
-                              &track_depth, &track_depth_type, (double)freq/track_freq, phase, intrvl_length * track_freq, &ampl);
+                              &track_depth, &track_depth_residual, &track_depth_type, (double)freq/track_freq, phase, intrvl_length * track_freq, &ampl);
             }
             else if (intrvl_type == 2)
             {
                triangle_generator(track_data + (track_depth/8) * intrvl_start * track_freq, 
-                              &track_depth, &track_depth_type, (double)freq/track_freq, phase, intrvl_length * track_freq, &ampl);
+                              &track_depth, &track_depth_residual, &track_depth_type, (double)freq/track_freq, phase, intrvl_length * track_freq, &ampl);
             }
          }
          else
@@ -71,8 +72,9 @@ int main() {
          break;
 
       case 4:
+       write_params_to_file(&track_length, &track_depth, &track_depth_residual, &track_depth_type, &track_freq, file_param_name, stream_par);
        write_to_file(stream,file_name, track_data, track_length*track_freq, &track_depth, &track_depth_type);
-       write_params_to_file(&track_length, &track_depth, &track_depth_type, &track_freq, file_param_name, stream_par);
+       
        
        break;
 

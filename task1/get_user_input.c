@@ -48,7 +48,7 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
          *track_depth_type = 1;
          break;
       case 6:
-         printf("\tPlease enter a custom depth(integer number): ");
+         printf("\tPlease enter a custom depth (integer number): ");
          scanf("%d", track_depth);
          break;
       default:
@@ -76,6 +76,7 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
       case 4:
          printf("\tPlease enter a desired freq (integer, Hz): ");
          scanf("%d", track_freq);
+         break;
       
       default:
          printf("Wrong input. Try again. \n");
@@ -91,11 +92,11 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
       scanf("%d", intrvl_start);
       printf("Please enter the length (in seconds) ");
       scanf("%d", intrvl_length);
-      printf("Please enter the amplitude ");
+      printf("Please enter the amplitude (integer) ");
       scanf("%d", ampl);
-      printf("Please enter the freq ");
+      printf("Please enter the freq (integer) ");
       scanf("%d", freq);
-      printf("Please enter the phase ");
+      printf("Please enter the phase (integer) ");
       scanf("%d", phase);
       break;
     case 4:

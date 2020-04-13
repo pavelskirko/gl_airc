@@ -4,9 +4,10 @@
 #include <math.h>
 #include <string.h>
 
-void sine_generator(char * track_data_start, int * track_depth, int * track_depth_type, 
+void sine_generator(char * track_data_start, int * track_depth, int * track_depth_residual, int * track_depth_type, 
                      float specific_freq, float specific_phase, int specific_length, int * ampl);
-void triangle_generator(char * track_data_start, int * track_depth, int * track_depth_type, 
+void triangle_generator(char * track_data_start, int * track_depth, int * track_depth_residual, int * track_depth_type, 
                      float specific_freq, float specific_phase, int specific_length, int * ampl);
+void track_depth_check(int * track_depth, int * track_depth_residual);
 
 #endif
