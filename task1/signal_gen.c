@@ -1,7 +1,5 @@
 #include "signal_gen.h"
 
-//TODO implement custom depth
-
 //TODO switch to sending values to functions instead of pointers where it is suitable
 
 int main() {
@@ -36,6 +34,7 @@ int main() {
       //    4) Write track to the file
       //    5) Print track to the console
       //    6) Close
+      
       switch (user_choise)
       {
       case 1:

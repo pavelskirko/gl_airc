@@ -47,8 +47,6 @@ void recover_from_file(char ** track_data, int * track_length, int * track_depth
        {
            int sample = 10;
            r = fscanf(stream, "%i\n", &sample);
-           printf("sample = %i\n", sample);
-           printf("r = %i", r);
            while(r != EOF)
            {
                memcpy(*track_data + i * *track_depth / 8, &sample, *track_depth / 8);

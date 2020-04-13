@@ -27,7 +27,7 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
       printf("\t3) 24 bit \n");
       printf("\t4) 32 bit \n");
       printf("\t5) 32 bit float\n");
-      printf("\t6) custom input \n");
+      printf("\t6) custom integer depth (1-32) \n");
       scanf("%d", user_choise_2nd);
       switch (*user_choise_2nd)
       {
@@ -56,11 +56,11 @@ void get_user_input(int * track_length, int * track_depth, int * track_depth_typ
          break;
       }
       *user_choise_2nd = 0;
-      printf("Please choose a desired freq (1-4): \n"
+      printf("Please choose a desired discretization freq (1-4): \n"
       "\t1) 44.1 kHz \n"
       "\t2) 44 kHz \n"
       "\t3) 96 kHz \n"
-      "\t4) Custom \n");
+      "\t4) Custom freq\n");
       scanf("%d", user_choise_2nd);
       switch (*user_choise_2nd)
       {
