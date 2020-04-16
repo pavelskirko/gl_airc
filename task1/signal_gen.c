@@ -3,23 +3,23 @@
 //TODO switch to sending values to functions instead of pointers where it is suitable
 
 int main() {
-   int track_length;
-   int track_depth;
-   int track_depth_residual;
+   int track_length = 0;
+   int track_depth = 0;
+   int track_depth_residual = 0;
    int track_depth_type = 0; // 1 if float 32
-   int track_freq;
-   int intrvl_type; // 1 -- sine; 2 -- triangle
-   int intrvl_start;
-   int intrvl_length;
-   int ampl;
-   int freq;
-   int phase;
-   int user_choise;
-   int user_choise_2nd;
+   int track_freq = 0;
+   int intrvl_type = 0; // 1 -- sine; 2 -- triangle
+   int intrvl_start = 0;
+   int intrvl_length = 0;
+   int ampl = 0;
+   int freq = 0;
+   int phase = 0;
+   int user_choise = 0;
+   int user_choise_2nd = 0;
    char file_name[] = "generated_signal.csv";
    char file_param_name[] = "track_parameters.txt";
-   FILE *stream;
-   FILE *stream_par;
+   FILE *stream = NULL;
+   FILE *stream_par = NULL;
    char * track_data;
    int track_memory_allocated = 0;
    printf("The following program is generating a set of user defined signals on a given time interval. \n");
@@ -40,6 +40,7 @@ int main() {
       case 1:
          recover_from_file(&track_data, &track_length, &track_depth, &track_depth_residual, &track_depth_type, &track_freq, file_name, file_param_name, 
                                        stream, stream_par, &track_memory_allocated);
+         printf("Done.\n");
          break;
       case 2:
          track_depth_check(&track_depth, &track_depth_residual);
@@ -72,13 +73,15 @@ int main() {
 
       case 4:
        write_params_to_file(&track_length, &track_depth, &track_depth_residual, &track_depth_type, &track_freq, file_param_name, stream_par);
+       printf("Parameters of the track saved to track_parameters.txt\n");
        write_to_file(stream,file_name, track_data, track_length*track_freq, &track_depth, &track_depth_type);
-       
+       printf("Data saved in generated_signal.csv\n");
        
        break;
 
       case 5:
        print_track(track_data, track_length*track_freq, &track_depth, &track_depth_type);
+       printf("\n");
        break;
       case 6:
        if(track_memory_allocated)
