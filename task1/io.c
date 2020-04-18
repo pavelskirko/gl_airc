@@ -1,7 +1,7 @@
 #include "io.h"
 
-void recover_from_file(char ** track_data, int * track_length, int * track_depth, int * track_depth_residual, int * track_depth_type, int * track_freq,
-                            char * file_name, char * file_param_name, FILE *stream, FILE *stream_par, int * track_memory_allocated)
+void recover_from_file(char ** track_data, int *const track_length, int *const track_depth, int *const track_depth_residual, int *const track_depth_type, int *const track_freq,
+                            char *const file_name, char *const file_param_name, FILE *stream, FILE *stream_par, int *const track_memory_allocated)
 {
    stream_par = fopen(file_param_name, "r");
    if(stream_par == NULL)
@@ -59,8 +59,8 @@ void recover_from_file(char ** track_data, int * track_length, int * track_depth
     
 }
 
-void write_params_to_file(int * track_length, int * track_depth, int * track_depth_residual, int * track_depth_type, int * track_freq,
-                                                                    char * file_param_name, FILE *stream_par)
+void write_params_to_file(int *const track_length, int *const track_depth, int *const track_depth_residual, int *const track_depth_type, int *const track_freq,
+                                                                    char *const file_param_name, FILE *stream_par)
 {
     stream_par = fopen(file_param_name, "w");
     fprintf(stream_par, "%i\n", *track_length);
