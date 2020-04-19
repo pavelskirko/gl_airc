@@ -1,8 +1,7 @@
 IDIR = ./include
 CC=gcc
 ODIR = obj
-CFLAGS=-I$(IDIR)
-SRCDIR=
+CFLAGS=-I$(IDIR) 
 
 _DEPS = db_server.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))  # return each string in _DEPS as IDIR/%.o 
@@ -14,4 +13,4 @@ $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) -g
 
 db_server: $(OBJ)  
-	$(CC) -o $@ $^ $(CFLAGS) -lm
+	$(CC) -o $@ $^ $(CFLAGS) -lm -ljson-c
