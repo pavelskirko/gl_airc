@@ -6,6 +6,15 @@
 #include <math.h>
 #include <errno.h>
 #include <json-c/json.h>
+#include <netdb.h> 
+#include <stdlib.h> 
+#include <sys/socket.h> 
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#define MAX 80 
+#define PORT 8080 
+#define SA struct sockaddr 
 
 #define DB_FILE_NAME        "db.json"
 #define DB_FILE_NAME_REC    "dbrec.json"
