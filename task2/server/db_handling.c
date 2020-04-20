@@ -1,9 +1,4 @@
-#include "db_server.h"
-
-#define DB_FILE_NAME        "db.json"
-#define DB_FILE_NAME_REC    "dbrec.json"
-
-extern int errno ;
+#include "db_handling.h"
 
 void db_init(json_object ** jobj)
 {
@@ -42,14 +37,26 @@ void db_init(json_object ** jobj)
 
 }
 
-void db_save_to_file(json_object ** jobj)
+void db_save_to_file(json_object ** jobj, char * file_name, char * status)
 {
-    FILE * stream = fopen(DB_FILE_NAME, "w");
+    int errnum;
+    FILE * stream = fopen(file_name, "w");
+    if (stream == NULL)
+    {
+      errnum = errno;
+      fprintf(stderr, "Value of errno: %d\n", errno);
+      perror("Error printed by perror");
+      strcpy(status, strerror(errnum));
+      fprintf(stderr, "Error opening file: %s\n", strerror( errnum ));
+    }
+    else 
+    {
     fprintf(stream, "%s", json_object_to_json_string(*jobj));
     fclose(stream);
+    }
 }
 
-void db_read_from_file(json_object ** jobj, char * file_name)
+void db_read_from_file(json_object ** jobj, char * file_name, char * status)
 {
     int errnum;
     FILE * stream = fopen(file_name, "r");
@@ -58,6 +65,7 @@ void db_read_from_file(json_object ** jobj, char * file_name)
       errnum = errno;
       fprintf(stderr, "Value of errno: %d\n", errno);
       perror("Error printed by perror");
+      strcpy(status, strerror(errnum));
       fprintf(stderr, "Error opening file: %s\n", strerror( errnum ));
     }
     else 
@@ -69,8 +77,6 @@ void db_read_from_file(json_object ** jobj, char * file_name)
     *jobj = json_tokener_parse(buffer);
     }
 }
-
-
 
 void db_add_row(json_object ** jobj, json_object * new_jobj)
 {
@@ -93,7 +99,6 @@ void db_add_row(json_object ** jobj, json_object * new_jobj)
     json_object_array_add(jarray1,jstring);
     json_object_array_add(jarray2,jint);
     json_object_array_add(jarray3,jdouble);
-
 }
 
 void db_remove_row(json_object ** jobj, char * status)
@@ -127,23 +132,5 @@ void db_remove_row(json_object ** jobj, char * status)
             json_object_array_del_idx(jarray2, n_rows1, 1);
             json_object_array_del_idx(jarray3, n_rows1, 1);
         }
-    }
-    
-    
-}
-
-int main()
-{
-    json_object * jobj;
-    json_object * jobj_rec;
-    char * status = malloc(100);
-    strcpy(status, "ok");
-    db_init(&jobj);
-    db_save_to_file(&jobj);
-    db_read_from_file(&jobj, DB_FILE_NAME);
-    db_read_from_file(&jobj_rec, DB_FILE_NAME_REC);
-    db_add_row(&jobj, jobj_rec);
-    db_remove_row(&jobj, status);
-    printf("status: %s\n", status);
-    printf ("The json object created: %s\n",json_object_to_json_string(jobj));
+    } 
 }

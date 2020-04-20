@@ -6,5 +6,9 @@
 #include <math.h>
 #include <errno.h>
 #include <json-c/json.h>
+#include "db_handling.h"
+
+#define DB_FILE_NAME        "db.json"
+#define DB_FILE_NAME_REC    "dbrec.json"
 
 #endif
