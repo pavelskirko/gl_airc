@@ -15,7 +15,7 @@ The main goal is to generate periodic signal with given amplitude, frequency, bi
 
 A client-server application capable to store a 3-column table of data in json-like structure, add, remove items and conduct a search, following commands transmitted in form of serialized json messages. 
 
-A server stores database in a db.json file. When starting it initialize a table with 3 rows, which you can use as an example.
+A server stores database in a db.json file. When starting it initializes a table with 3 rows, which you can use as an example.
 
 ### how to use:
   - install json-c library on your system. In Ubuntu you can use the following:
