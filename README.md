@@ -19,10 +19,10 @@ A server stores database in a db.json file. When starting it initialize a table 
 
 ### how to use:
   - install json-c library on your system. In Ubuntu you can use the following:
-  '''
+  ```
   sudo apt install libjson-c-dev
-  '''
-  - use 'make' in both server and client directory
+  ```
+  - use `make` in both server and client directory
   - run db_server,  then db_client
   - use interface
 
