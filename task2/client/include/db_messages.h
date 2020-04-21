@@ -1,5 +1,5 @@
-#ifndef DB_CLIENT
-#define DB_CLIENT
+#ifndef DB_MESSAGES
+#define DB_MESSAGES
 
 #include <stdio.h>
 #include <string.h>
@@ -12,14 +12,17 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <ctype.h>
-#include "db_messages.h"
-#include "print_to_console.h"
 
 #define MAX 1024 
-#define PORT 8080 
-#define SA struct sockaddr 
 
 #define DB_FILE_NAME        "db.json"
 #define DB_FILE_NAME_REC    "dbrec.json"
+
+void send_row(char * msg, int msg_length);
+void remove_row(char * msg, int msg_length);
+void ask_for_a_table(char * msg, int msg_length);
+void exit_command(char * msg, int msg_length);
+void search(char * msg, int msg_length);
+
 
 #endif

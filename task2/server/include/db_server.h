@@ -17,4 +17,7 @@
 #define DB_FILE_NAME        "db.json"
 #define DB_FILE_NAME_REC    "dbrec.json"
 
+void talk_with_client(int sockfd , json_object ** j_db, char * status);
+
+
 #endif
