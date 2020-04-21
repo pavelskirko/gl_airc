@@ -158,9 +158,9 @@ void get_row_by_number(json_object * j_db, char * buff, int row_num, char * stat
     int n_rows2 = json_object_array_length(jarray2);
     int n_rows3 = json_object_array_length(jarray3);
 
-    if(n_rows1 != n_rows2 || n_rows2 != n_rows3) strcpy(status, "db corrupted");
+    if(n_rows1 != n_rows2 || n_rows2 != n_rows3) strcpy(status, "db is corrupted");
     else{
-        if(n_rows1 == 0) strcpy(status, "db_empty");
+        if(n_rows1 == 0) strcpy(status, "db is empty");
         else if (n_rows1 < row_num) strcpy(status, "no such row");
         else
         {
@@ -176,6 +176,16 @@ void get_row_by_number(json_object * j_db, char * buff, int row_num, char * stat
     jstatus = json_object_new_string(status);
     json_object_object_add(j_msg_ans, "Status", jstatus);
     json_object_object_add(j_msg_ans, "Row", j_row);
-    
+
     strcpy(buff, json_object_to_json_string(j_msg_ans));
+}
+
+void get_json_status(char * msg, int msg_length, char * status)
+{
+    json_object *jmsg = json_object_new_object();
+    json_object *jstatus = json_object_new_string(status);
+    json_object_object_add(jmsg,"Status", jstatus);
+
+    strcpy(msg, json_object_to_json_string(jmsg) );
+
 }

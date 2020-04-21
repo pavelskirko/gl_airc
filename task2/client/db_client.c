@@ -66,10 +66,19 @@ void remove_row(char * msg, int msg_length)
     strcpy(msg, json_object_to_json_string(jmsg) );
 }
 
-void show_the_whole_table(char * msg, int msg_length)
+void ask_for_a_table(char * msg, int msg_length)
 {
     json_object *jmsg = json_object_new_object();
     json_object *jcommand = json_object_new_string("show");
+    json_object_object_add(jmsg,"Command", jcommand);
+
+    strcpy(msg, json_object_to_json_string(jmsg) );
+}
+
+void exit_command(char * msg, int msg_length)
+{
+    json_object *jmsg = json_object_new_object();
+    json_object *jcommand = json_object_new_string("exit");
     json_object_object_add(jmsg,"Command", jcommand);
 
     strcpy(msg, json_object_to_json_string(jmsg) );
@@ -86,7 +95,7 @@ void search(char * msg, int msg_length)
     json_object *jcommand = json_object_new_string("search");
     json_object_object_add(jmsg,"Command", jcommand);
 
-    printf("Please enter the name of a rocket you are looking for ");
+    printf("Please enter the name of a rocket you are looking for: ");
     while ((user_input[n++] = getchar()) != '\n'); 
     user_input[n-1] = 0;
     json_object *jrocket = json_object_new_string(user_input);
@@ -99,6 +108,82 @@ void search(char * msg, int msg_length)
     strcpy(msg, json_object_to_json_string(jmsg) );
 }
 
+void print_a_status(char * msg, int msg_length)
+{
+    json_object *jmsg = json_tokener_parse(msg);
+    
+    json_object *jstatus;
+
+    json_object_object_get_ex(jmsg, "Status", &jstatus);
+    printf("Status: %s\n", json_object_get_string(jstatus) );
+}
+
+
+void print_a_table(char * msg, int msg_length)
+{
+    json_object *jmsg = json_tokener_parse(msg);
+    json_object *jtable;
+    json_object *jarray1;
+    json_object *jarray2;
+    json_object *jarray3;
+
+    json_object *jrocket;
+    json_object *jflights;
+    json_object *jsucc;
+
+    json_object *jstatus;
+
+    json_object_object_get_ex(jmsg, "Status", &jstatus);
+    json_object_object_get_ex(jmsg, "Table", &jtable);
+    json_object_object_get_ex(jtable, "Name of a rocket", &jarray1);
+    json_object_object_get_ex(jtable, "Number of flights", &jarray2);
+    json_object_object_get_ex(jtable, "Success rate", &jarray3);
+    int n_rows1 = json_object_array_length(jarray1);
+    int n_rows2 = json_object_array_length(jarray2);
+    int n_rows3 = json_object_array_length(jarray3);
+    if(n_rows1 != n_rows2 || n_rows2 != n_rows3) printf("db is corrupted");
+    else
+    {   
+        printf("#\tName of a rocket\tNumber of flights\tSuccess rate\n");
+        for(int i = 0; i < n_rows1; i++)
+        {
+            jrocket = json_object_array_get_idx(jarray1, i); // last element
+            jflights = json_object_array_get_idx(jarray2, i);
+            jsucc = json_object_array_get_idx(jarray3, i);
+            printf("%i\t\t%s\t%i\t\t\t%.2f\n", i, json_object_get_string(jrocket),
+                            json_object_get_int(jflights), json_object_get_double(jsucc));
+        }
+        printf("Status: %s\n", json_object_get_string(jstatus) );
+    }
+}
+
+void print_a_row(char * msg, int msg_length)
+{
+    json_object *jmsg = json_tokener_parse(msg);
+    json_object *jrow;
+
+    json_object *jrocket;
+    json_object *jflights;
+    json_object *jsucc;
+
+    json_object *jstatus;
+
+    json_object_object_get_ex(jmsg, "Status", &jstatus);
+    if( strcmp(json_object_get_string(jstatus), "ok") ) printf("Status: %s\n", json_object_get_string(jstatus));
+    else
+    {    
+        json_object_object_get_ex(jmsg, "Row", &jrow);
+        json_object_object_get_ex(jrow, "Name of a rocket", &jrocket);
+        json_object_object_get_ex(jrow, "Number of flights", &jflights);
+        json_object_object_get_ex(jrow, "Success rate", &jsucc);
+       
+        printf("Name of a rocket\tNumber of flights\tSuccess rate\n");
+        printf("%s\t\t%i\t\t\t%.2f\n", json_object_get_string(jrocket),
+                            json_object_get_int(jflights), json_object_get_double(jsucc));
+        printf("Status: %s\n", json_object_get_string(jstatus) );
+    }
+}
+
 void get_user_input(int * user_ans)
 {
     int n = 0;
@@ -109,10 +194,12 @@ void get_user_input(int * user_ans)
         "\t1) Add row\n"
         "\t2) Remove last row\n"
         "\t3) Show the whole table\n"
-        "\t4) Search\n");
+        "\t4) Search\n"
+        "\t5) Exit\n");
         while ((user_input[n++] = getchar()) != '\n'); 
         *user_ans = atoi(user_input);
-        if( *user_ans < 1 || *user_ans > 4 ) continue;
+        bzero(user_input, MAX);
+        if( *user_ans < 1 || *user_ans > 5 ) continue;
         else break;
     }
 }
@@ -135,28 +222,33 @@ void talk_with_server(int sockfd)
         case 2:
             remove_row(buff, MAX);
             write(sockfd, buff, MAX); 
+            bzero(buff, MAX);
+            read(sockfd, buff, sizeof(buff));
+            print_a_status(buff, MAX);
             break;
         case 3:
-            show_the_whole_table(buff, MAX);
+            ask_for_a_table(buff, MAX);
             write(sockfd, buff, MAX); 
+            bzero(buff, MAX);
+            read(sockfd, buff, sizeof(buff));
+            print_a_table(buff, MAX);
             break;
         case 4:
             search(buff, MAX);
-            write(sockfd, buff, MAX); 
+            write(sockfd, buff, MAX);
+            bzero(buff, MAX);
+            read(sockfd, buff, sizeof(buff));
+            print_a_row(buff, MAX);
             break;
-
+        case 5:
+            exit_command(buff, MAX);
+            write(sockfd, buff, MAX);
+            break;
         default:
             break;
-        }
-
-        // write(sockfd, buff, sizeof(buff)); 
-        // bzero(buff, sizeof(buff)); 
-        // read(sockfd, buff, sizeof(buff)); 
-        // printf("From Server : %s", buff); 
-        if ((strncmp(buff, "exit", 4)) == 0) { 
-            printf("Client Exit...\n"); 
-            break; 
+        
         } 
+    if (user_ans == 5) break;
     } 
 } 
 
@@ -191,7 +283,7 @@ int main()
   
     // function for chat 
     talk_with_server(sockfd); 
-  
+    printf("Communication ended. Have a nice day!\n");
     // close the socket 
     close(sockfd); 
 }
