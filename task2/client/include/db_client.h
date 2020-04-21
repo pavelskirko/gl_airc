@@ -11,8 +11,9 @@
 #include <sys/socket.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <ctype.h>
 
-#define MAX 80 
+#define MAX 1024 
 #define PORT 8080 
 #define SA struct sockaddr 
 

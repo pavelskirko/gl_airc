@@ -134,3 +134,48 @@ void db_remove_row(json_object ** jobj, char * status)
         }
     } 
 }
+
+void get_row_by_number(json_object * j_db, char * buff, int row_num, char * status)
+{
+    json_object *j_row = json_object_new_object();
+    json_object *j_msg_ans = json_object_new_object();
+
+    json_object *jarray1;
+    json_object *jarray2;
+    json_object *jarray3;
+
+    json_object *jrocket;
+    json_object *jflights;
+    json_object *jsucc;
+
+    json_object *jstatus;
+
+    json_object_object_get_ex(j_db, "Name of a rocket", &jarray1);
+	json_object_object_get_ex(j_db, "Number of flights", &jarray2);
+	json_object_object_get_ex(j_db, "Success rate", &jarray3);
+
+    int n_rows1 = json_object_array_length(jarray1);
+    int n_rows2 = json_object_array_length(jarray2);
+    int n_rows3 = json_object_array_length(jarray3);
+
+    if(n_rows1 != n_rows2 || n_rows2 != n_rows3) strcpy(status, "db corrupted");
+    else{
+        if(n_rows1 == 0) strcpy(status, "db_empty");
+        else if (n_rows1 < row_num) strcpy(status, "no such row");
+        else
+        {
+            jrocket = json_object_array_get_idx(jarray1, row_num); // last element
+            jflights = json_object_array_get_idx(jarray2, row_num);
+            jsucc = json_object_array_get_idx(jarray3, row_num);
+
+            json_object_object_add(j_row, "Name of a rocket", jrocket);
+            json_object_object_add(j_row, "Number of flights", jflights);
+            json_object_object_add(j_row, "Success rate", jsucc);
+        }
+    } 
+    jstatus = json_object_new_string(status);
+    json_object_object_add(j_msg_ans, "Status", jstatus);
+    json_object_object_add(j_msg_ans, "Row", j_row);
+    
+    strcpy(buff, json_object_to_json_string(j_msg_ans));
+}

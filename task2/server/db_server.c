@@ -1,23 +1,67 @@
 #include "db_server.h"
 
 
-#define MAX 80 
+#define MAX 1024 
 #define PORT 8080 
 #define SA struct sockaddr
 
 extern int errno ;
 
-void talk_with_client(int sockfd)
+void talk_with_client(int sockfd , json_object ** j_db, char * status)
 {
     char buff[MAX]; 
+    json_object * jmsg;
+    json_object *jcommand;
     int n; 
-    // infinite loop for chat 
         while(1)
         { 
         bzero(buff, MAX); 
-  
-        // read the message from client and copy it in buffer 
         read(sockfd, buff, sizeof(buff)); 
+        jmsg = json_tokener_parse(buff);
+        printf("%s", buff);
+        json_object_object_get_ex(jmsg, "Command", &jcommand);
+        
+        if ( !strcmp(json_object_get_string(jcommand), "add") )
+        {
+            json_object * jrow;
+            json_object_object_get_ex(jmsg, "Row", &jrow);
+            db_add_row(j_db, jrow);
+            printf ("The db now %s\n",json_object_to_json_string(*j_db));
+        }
+        else if ( !strcmp(json_object_get_string(jcommand), "remove") )
+        {
+            db_remove_row(j_db, status);
+        }
+        else if ( !strcmp(json_object_get_string(jcommand), "show") )
+        {
+            write(sockfd, json_object_to_json_string(*j_db), MAX);
+        }
+        else if ( !strcmp(json_object_get_string(jcommand), "search") )
+        {
+            json_object *jrocket_wanted;
+            json_object *jrocket;
+            json_object *jrockets_array;
+            json_object_object_get_ex(j_db, "Name of a rocket", &jrockets_array);
+            json_object_object_get_ex(jmsg, "Name of a rocket", &jrocket_wanted);
+            int n_rows = json_object_array_length(jrockets_array);
+            for(int i = 0; i < n_rows; i++)
+            {
+                jrocket = json_object_array_get_idx(jrockets_array, i);
+                if( strstr( json_object_get_string(jrocket), json_object_get_string(jrocket_wanted) ) == NULL )
+                    continue;
+                else
+                {
+                    bzero(buff, sizeof(buff)); 
+                    get_row_by_number(*j_db, buff, i, status);
+                }
+                
+            }
+
+        }
+        else 
+        {
+
+        }
         // print buffer which contains the client contents 
         printf("From client: %s\t To client : ", buff); 
         bzero(buff, MAX); 
@@ -42,18 +86,15 @@ int main()
     struct sockaddr_in servaddr, cli;
 
 
-    json_object * jobj;
-    json_object * jobj_rec;
+    json_object * j_db;
     char * status = malloc(100);
     strcpy(status, "ok");
-    db_init(&jobj);
-    db_save_to_file(&jobj, DB_FILE_NAME, status);
-    db_read_from_file(&jobj, DB_FILE_NAME, status);
-    db_read_from_file(&jobj_rec, DB_FILE_NAME_REC, status);
-    db_add_row(&jobj, jobj_rec);
-    db_remove_row(&jobj, status);
+    db_init(&j_db);
+    db_save_to_file(&j_db, DB_FILE_NAME, status);
+    db_read_from_file(&j_db, DB_FILE_NAME, status);
+    // db_remove_row(&j_db, status);
     printf("status: %s\n", status);
-    printf ("The json object created: %s\n",json_object_to_json_string(jobj));
+    printf ("The json object created: %s\n",json_object_to_json_string(j_db));
 
 
 
@@ -99,8 +140,9 @@ int main()
         printf("server acccept the client...\n"); 
   
     // Function for chatting between client and server 
-    talk_with_client(connfd); 
+    talk_with_client(connfd, &j_db, status); 
   
     // After chatting close the socket 
     close(sockfd);  
+    free(status);
 }
